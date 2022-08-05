@@ -34,6 +34,10 @@ class Settings(BaseSettings):
             path=f"/{values.get('POSTGRES_DB') or ''}",
         )
 
+    IP_GEOLOCATION_URL: str
+    CURRENCY_CONVERTER_URL: str
+    CURRENCY_CONVERTER_APIKEY: str
+
     class Config:
         case_sensitive = True
         env_file = ".env"

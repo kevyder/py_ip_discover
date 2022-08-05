@@ -12,6 +12,8 @@ class HTTPError(BaseModel):
 
 class IPinfo(BaseModel):
     country: str
-    iso: str
+    country_code: str
+    city: str
     currency: str
-    currency_to_usd: float
+    currency_to_usd: str
+    currency_to_eur: str

@@ -4,6 +4,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
+from app.ip_address_info import IPAddress
 from app.schemas import HTTPError, IPinfo
 
 
@@ -24,12 +25,17 @@ def get_application():
 app = get_application()
 
 
-@app.post("/ip/{ip_address}", responses={200: {"model": IPinfo}, 400: {"model": HTTPError}})
+@app.get("/ip/{ip_address}", responses={200: {"model": IPinfo}, 400: {"model": HTTPError}})
 def get_ip_info(ip_address: str):
 
-    ipv4 = r'^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$'
+    ipv4_pattern = r'''^(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.(
+                        25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.(
+                        25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.(
+                        25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)$'''
 
-    if not re.search(ipv4, ip_address):
+    if not re.search(ipv4_pattern, ip_address):
         raise HTTPException(status_code=400, detail="Invalid IP address")
 
-    return ip_address
+    ip_info = IPAddress(ip_address).get_info()
+
+    return ip_info
