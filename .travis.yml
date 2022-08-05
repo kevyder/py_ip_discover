@@ -6,5 +6,5 @@ install:
 - poetry install
 - pip install coveralls
 script:
-- coverage run --source='.' pytest
+- coverage run -m pytest
 after_success: coveralls
