@@ -1,4 +1,5 @@
 import requests
+from fastapi import HTTPException, status
 
 from app.core.config import settings
 from app.schemas import IPinfo
@@ -9,28 +10,34 @@ class IPAddress:
         self.ip_address = ip_address
 
     def __get_country_info(self):
-        country_info = requests.get(
+        country_info_request = requests.get(
             url=f'{settings.IP_GEOLOCATION_URL}/{self.ip_address}',
-            params={'fields': 'country,countryCode,city,currency'}
+            params={'fields': 'status,message,country,countryCode,city,currency'}
         )
 
-        response = country_info.json()
+        country_info_response = country_info_request.json()
 
-        self.country = response['country']
-        self.country_code = response['countryCode']
-        self.city = response['city']
-        self.currency = response['currency']
+        if country_info_response['status'] == 'fail':
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=country_info_response['message']
+            )
+
+        self.country = country_info_response['country']
+        self.country_code = country_info_response['countryCode']
+        self.city = country_info_response['city']
+        self.currency = country_info_response['currency']
 
     def __get_currency_info(self):
-        currency_conversion = requests.get(
+        currency_conversion_request = requests.get(
             url=f'{settings.CURRENCY_CONVERTER_URL}?base={self.currency}&symbols=EUR,USD',
             headers={'apikey': settings.CURRENCY_CONVERTER_APIKEY}
         )
 
-        response = currency_conversion.json()
+        currency_conversion_response = currency_conversion_request.json()
 
-        self.to_eur = response['rates']['EUR']
-        self.to_usd = response['rates']['USD']
+        self.to_eur = currency_conversion_response['rates']['EUR']
+        self.to_usd = currency_conversion_response['rates']['USD']
 
     def __create_ip_info_schema(self):
         ip_info = IPinfo(
