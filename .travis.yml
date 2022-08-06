@@ -1,6 +1,8 @@
 language: python
 python:
 - 3.9
+env:
+  - BACKEND_CORS_ORIGINS=["http://localhost:8000", "https://localhost:8000", "http://localhost", "https://localhost"]
 install:
 - pip install poetry
 - poetry install
