@@ -1,8 +1,8 @@
-from database import Session
 from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
+from app.database import Session
 from app.logic.ip_address_info import IPAddress
 from app.schemas import HTTPError, IPinfo, IPPermission
 from app.validators.ip_address_validator import IPAddressValidator
