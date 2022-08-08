@@ -1,5 +1,6 @@
 from app.database import Session
 from app.models import IPPermission
+from app.schemas import IPPermission as IPPermissionSchema
 
 
 class IPPermissionsManager:
@@ -29,6 +30,8 @@ class IPPermissionsManager:
     def set_permissions(self, db: Session, allowed: bool) -> IPPermission:
         ip_record = self.get_permissions(db)
         if ip_record:
-            return self.__update_permissions(db, ip_record, allowed)
+            self.__update_permissions(db, ip_record, allowed)
         else:
-            return self.__create_permissions(db, allowed)
+            self.__create_permissions(db, allowed)
+
+        return IPPermissionSchema(ip_address=self.ip_address, allowed=allowed)

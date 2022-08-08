@@ -1,4 +1,4 @@
-from fastapi import Depends, FastAPI
+from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
@@ -37,10 +37,20 @@ app = get_application()
 @app.get("/ip/{ip_address}", responses={200: {"model": IPinfo}, 400: {"model": HTTPError}})
 def get_ip_info(ip_address: str, db: Session = Depends(get_db)):
     IPAddressValidator(ip_address=ip_address).validate_ipv4()
+    ip_record = IPPermissionsManager(ip_address=ip_address).get_permissions(db)
+    if ip_record:
+        if not ip_record.allowed:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="IP address is not allowed, ask for permissions"
+            )
     return IPAddress(ip_address).get_info()
 
 
-@app.post("/set-ip-restriction/", responses={400: {"model": HTTPError}})
+@app.post(
+    "/set-ip-permissions/",
+    responses={200: {"model": IPPermission}, 400: {"model": HTTPError}}
+)
 def set_ip_restriction(ip_permissions: IPPermission, db: Session = Depends(get_db)):
     ip_address = ip_permissions.ip_address
     allowed = ip_permissions.allowed
