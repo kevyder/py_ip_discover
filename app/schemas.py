@@ -33,3 +33,18 @@ class IPinfo(BaseModel):
                 "currency_to_eur": "0.0002",
             },
         }
+
+
+class IPPermission(BaseModel):
+    ip_address: str
+    allowed: bool
+
+    class Config:
+        orm_mode = True
+
+        schema_extra = {
+            "example": {
+                "ip_address": "200.255.255.255",
+                "allowed": False
+            },
+        }

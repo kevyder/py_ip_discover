@@ -10,16 +10,19 @@ repos:
           - --expand-star-imports
           - --remove-duplicate-keys
           - --remove-unused-variables
-  -   repo: https://github.com/PyCQA/flake8/
-      rev: 4.0.1
-      hooks:
+  - repo: https://github.com/PyCQA/flake8/
+    rev: 4.0.1
+    hooks:
       - id: flake8
-        args: ['--config=./.flake8']
+        exclude: migrations
+        args:
+          - --config=setup.cfg
   - repo: https://github.com/pre-commit/mirrors-isort
     rev: v5.4.2
     hooks:
       - id: isort
-        args: ["--profile", "black"]
+        args:
+          - --profile black
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v3.3.0
     hooks:
